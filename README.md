@@ -21,17 +21,6 @@ Everything runs in the browser. There is no backend, no tracking and no data lea
 
 Open `index.html` in any browser. No build step.
 
-## Deploy on GitHub Pages
-
-1. Push this folder to a repository (for example `cra-scope-checker`).
-2. Go to **Settings > Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, branch `main`, folder `/ (root)`.
-4. Save. The site appears at `https://<username>.github.io/<repository>/`.
-
-## Configure
-
-Edit the `CONTACT` block near the top of the script in `index.html` to change the "Book a gap assessment" email and subject. The brand name appears in the title, header, footer and exported text.
-
 ## Limits
 
 This is an indicative reading of the regulation, not legal advice. Classification depends on a product's core functionality and exact facts. Harmonised standards and Commission guidance for the CRA are still developing. The standards list is guidance for evidence, not a presumption of conformity. Verify against the [official text](https://eur-lex.europa.eu/eli/reg/2024/2847/oj) before relying on a result.
