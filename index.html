@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRA Scope Checker | sudoninja</title>
+<meta name="description" content="Free, client-side checker for the EU Cyber Resilience Act (Regulation (EU) 2024/2847): scope, role, risk class, conformity route, obligations and key dates.">
+<meta name="author" content="sudoninja">
+<meta name="theme-color" content="#16305c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="EU Cyber Resilience Act Scope Checker">
+<meta property="og:description" content="Does the CRA apply to your product? Find your risk class, conformity route, obligations and deadlines. Runs entirely in your browser.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316305c'/%3E%3Cpath d='M16 5l9 3.5v7c0 5.5-3.8 9.6-9 11.5-5.2-1.9-9-6-9-11.5v-7z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Cpath d='M12 16l3 3 5-6' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--ink:#14213d;--muted:#5b6479;--line:#dfe3ee;
+  --brand:#16305c;--brand2:#2f6fed;--ok:#0f7b4f;--okbg:#e6f6ee;--warn:#9a5b00;--warnbg:#fff3dc;--bad:#a6283a;--badbg:#fdeaed;--info:#1f4fb4;--infobg:#e8effd;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1424;--card:#161e33;--ink:#e8ecf7;--muted:#9aa5c0;--line:#2a3554;--brand:#9db8f5;--brand2:#6d9bff;--ok:#5fd6a0;--okbg:#10301f;--warn:#f1b658;--warnbg:#33260c;--bad:#ff8b9b;--badbg:#3a141b;--info:#9db8f5;--infobg:#17264a}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:24px 16px 64px}
+header h1{margin:0 0 4px;font-size:1.7rem;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted)}
+.tag{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--brand);margin-bottom:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:20px}
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--brand2);width:0;transition:width .25s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;margin:10px 0 14px}
+h2{margin:0 0 6px;font-size:1.3rem}
+.help{color:var(--muted);margin:0 0 16px}
+.opts{display:grid;gap:10px}
+.grp{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 0}
+label.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+label.opt:hover{border-color:var(--brand2)}
+label.opt:has(input:checked){border-color:var(--brand2);background:var(--infobg)}
+label.opt:has(input:focus-visible){outline:2px solid var(--brand2);outline-offset:2px}
+label.opt input{margin-top:4px;accent-color:var(--brand2)}
+.opt b{display:block}
+.opt span{color:var(--muted);font-size:.9rem}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+button{font:inherit;border-radius:10px;padding:10px 18px;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+button.primary{background:var(--brand2);border-color:var(--brand2);color:#fff;font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--brand2);outline-offset:2px}
+.verdict{border-radius:12px;padding:16px 18px;margin-bottom:18px}
+.verdict h2{margin:0 0 4px}
+.v-in{background:var(--warnbg);color:var(--warn)}
+.v-out{background:var(--okbg);color:var(--ok)}
+.v-steward{background:var(--infobg);color:var(--info)}
+.verdict p{margin:0;color:var(--ink)}
+h3{margin:22px 0 8px;font-size:1.05rem}
+ul.clean{margin:0;padding-left:20px}
+ul.clean li{margin:5px 0}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:600}
+@media(max-width:520px){.kv{grid-template-columns:1fr}.kv dd{margin-bottom:6px}}
+.timeline{display:grid;gap:10px}
+.tl{display:flex;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;align-items:center}
+.tl .d{min-width:104px;font-weight:700}
+.pill{font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.p-now{background:var(--badbg);color:var(--bad)}
+.p-soon{background:var(--warnbg);color:var(--warn)}
+.p-done{background:var(--okbg);color:var(--ok)}
+.tl div.t{flex:1}
+.tl small{color:var(--muted);display:block}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--brand2);padding-bottom:12px;margin-bottom:18px}
+.brand .by{font-size:.85rem;color:var(--muted)}
+.brand .by b{color:var(--ink);font-size:1.05rem;letter-spacing:.02em}
+.brand .pill2{font-size:.75rem;font-weight:700;color:var(--brand);border:1.5px solid var(--brand);border-radius:99px;padding:2px 10px}
+.callout{background:var(--warnbg);color:var(--ink);border-left:4px solid var(--warn);border-radius:8px;padding:12px 14px;margin:14px 0}
+.disclaimer{font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);margin-top:24px;padding-top:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.answers{font-size:.9rem;color:var(--muted)}
+footer{margin-top:24px;color:var(--muted);font-size:.8rem;text-align:center}
+@media print{
+  body{background:#fff;color:#000}.progress,.nav,.actions,.noprint{display:none!important}
+  .card{border:none;padding:0}.wrap{padding:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="by">Presented by <b>sudoninja</b></div><span class="pill2">Cybersecurity</span></div>
+    <div class="tag">Regulation (EU) 2024/2847</div>
+    <h1>Does the EU Cyber Resilience Act apply to your product?</h1>
+    <p>A few short questions. You get an indicative answer on scope, your role, risk class, how to prove compliance, and the dates that matter.</p>
+  </header>
+  <main class="card" id="app" aria-live="polite"></main>
+  <footer><b>sudoninja</b> &middot; Indicative self-assessment only. Not legal advice. Runs entirely in your browser; nothing is sent anywhere.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- Contact (edit here) ---------- */
+const CONTACT = {
+  email: "sanjay.singh@graniteriverlabs.com",
+  subject: "CRA gap assessment enquiry"
+};
+
+/* ---------- Dates ---------- */
+const D_REPORT = new Date("2026-09-11T00:00:00Z");
+const D_NB     = new Date("2026-06-11T00:00:00Z");
+const D_FULL   = new Date("2027-12-11T00:00:00Z");
+
+/* ---------- Question definitions ---------- */
+const C1 = [
+ "Identity management and privileged access management software and hardware, including access control and biometric readers",
+ "Standalone and embedded browsers",
+ "Password managers",
+ "Software that searches for, removes or quarantines malicious software",
+ "Products with a VPN function",
+ "Network management systems",
+ "Security information and event management (SIEM) systems",
+ "Boot managers",
+ "PKI and digital certificate issuance software",
+ "Physical and virtual network interfaces",
+ "Operating systems",
+ "Routers, modems for internet connection, and switches",
+ "Microprocessors with security-related functionalities",
+ "Microcontrollers with security-related functionalities",
+ "ASICs and FPGAs with security-related functionalities",
+ "Smart-home general-purpose virtual assistants",
+ "Smart-home products with security functions (smart door locks, security cameras, baby monitors, alarm systems)",
+ "Internet-connected toys with social interactive features or location tracking",
+ "Wearables for health monitoring (not medical devices) or intended for children"
+];
+const C2 = [
+ "Hypervisors and container runtime systems",
+ "Firewalls, intrusion detection and prevention systems",
+ "Tamper-resistant microprocessors",
+ "Tamper-resistant microcontrollers"
+];
+const CR = [
+ "Hardware devices with security boxes",
+ "Smart meter gateways in smart metering systems",
+ "Smart cards or similar devices, including secure elements"
+];
+
+const STEPS = [
+ {id:"market",title:"Will you sell or supply it in the EU?",help:"The CRA follows the product, not the company. A manufacturer in India, the US or the UK is covered if the product is made available on the EU market.",
+  opts:[
+   {v:"yes",l:"Yes, or we plan to",d:"Sold, distributed or supplied to customers in any EU country."},
+   {v:"no",l:"No, not in the EU",d:"No EU customers and no plan to place it on the EU market."}]},
+ {id:"kind",title:"What kind of product is it?",help:"The CRA covers hardware and software, plus cloud pieces that the product cannot work without.",
+  opts:[
+   {v:"hw",l:"A physical device with software or firmware",d:"IoT device, router, camera, controller, wearable, ECU, appliance."},
+   {v:"sw",l:"Software you install or run locally",d:"Desktop, mobile or embedded app, driver, library, operating system."},
+   {v:"rdp",l:"Cloud service that a device or app depends on",d:"Backend built by you or for you; without it the product loses a function (for example, a companion app's cloud)."},
+   {v:"saas",l:"Pure cloud service (SaaS/website) with nothing installed",d:"Used only through a browser or API; no device, app or agent from you."}]},
+ {id:"connect",title:"Can it connect to another device or a network?",help:"Direct or indirect, physical or logical. Ethernet, Wi-Fi, Bluetooth, cellular, USB, serial ports and APIs all count.",
+  opts:[
+   {v:"yes",l:"Yes, it connects or can be connected",d:"Including if connection is only a reasonably foreseeable use."},
+   {v:"no",l:"No, it is fully isolated",d:"No data connection of any kind, by design and in practice."}]},
+ {id:"radio",title:"Does it use radio communication?",help:"Wi-Fi, Bluetooth, cellular, Zigbee, Thread, LoRa, NFC. Radio equipment is also covered by the Radio Equipment Directive (RED), which already has its own cybersecurity rules.",
+  opts:[
+   {v:"yes",l:"Yes, it has a radio interface",d:"Including modules built into the product."},
+   {v:"no",l:"No, wired or non-radio only",d:""}]},
+ {id:"excl",title:"Is it already covered by another EU regime?",help:"Some sectors have their own cybersecurity rules and are carved out of the CRA. Tick all that apply.",multi:true,
+  opts:[
+   {v:"med",l:"Medical device or in-vitro diagnostic",d:"Regulation (EU) 2017/745 or 2017/746."},
+   {v:"veh",l:"Type-approved road vehicle or its approved parts",d:"Regulation (EU) 2019/2144 (UN R155/R156 route)."},
+   {v:"avi",l:"Certified civil aviation product",d:"Regulation (EU) 2018/1139."},
+   {v:"mar",l:"Marine equipment",d:"Directive 2014/90/EU."},
+   {v:"def",l:"Made exclusively for national security or defence",d:"Including products handling classified information."},
+   {v:"spare",l:"Identical spare part",d:"Made only to replace a defective part of the same product."},
+   {v:"none",l:"None of these",d:""}]},
+ {id:"supply",title:"How is it supplied?",help:"The CRA applies to products supplied in the course of a commercial activity.",
+  opts:[
+   {v:"comm",l:"Commercial",d:"Sold, licensed, or given away but monetised (paid support, personal data, bundled with a paid product)."},
+   {v:"foss",l:"Free and open source, not commercial",d:"Published for the community with no monetisation."},
+   {v:"steward",l:"We steward an open-source project",d:"Sustained support for open-source software meant for commercial use by others (a foundation, for example)."},
+   {v:"internal",l:"Internal use only",d:"Never made available to anyone outside your organisation."}]},
+ {id:"role",title:"What is your role?",help:"Obligations depend on where you sit in the supply chain.",
+  opts:[
+   {v:"mfr",l:"Manufacturer",d:"You design, develop or produce it, or have it made and sell it under your name."},
+   {v:"imp",l:"Importer",d:"You bring a product from a manufacturer outside the EU onto the EU market."},
+   {v:"dist",l:"Distributor or reseller",d:"You resell a product without changing it."},
+   {v:"mod",l:"Rebrander or modifier",d:"You sell another maker's product under your own name, or you substantially change it."}]},
+ {id:"cat",title:"Does its core function match a higher-risk category?",help:"Pick the single best match. If several apply, choose the highest tier. The category depends on the product's core functionality, not on any feature.",
+  opts:[{v:"none",l:"None of these",d:"Most products fall here (the 'default' class)."},
+   {g:"Critical (Annex IV)"},...CR.map(x=>({v:"crit|"+x,l:x,d:""})),
+   {g:"Important, Class II (Annex III)"},...C2.map(x=>({v:"c2|"+x,l:x,d:""})),
+   {g:"Important, Class I (Annex III)"},...C1.map(x=>({v:"c1|"+x,l:x,d:""}))]},
+ {id:"industrial",title:"Is it meant for industrial or critical-infrastructure environments?",help:"Factories, OT/ICS/IACS networks, energy, building automation. This does not change the legal class by itself, but industrial network and security products often match a higher-risk category.",
+  show:a=>catClass(a)==="default",
+  opts:[
+   {v:"yes",l:"Yes, industrial or OT use",d:"PLCs, gateways, industrial switches, remote-access or monitoring products."},
+   {v:"no",l:"No, consumer or general commercial use",d:""}]},
+ {id:"timing",title:"When will you first place it on the EU market?",help:"Most obligations start on 11 December 2027. Products already on the market before then get lighter treatment.",
+  opts:[
+   {v:"after",l:"On or after 11 December 2027",d:"Includes new products and new models."},
+   {v:"before",l:"Before 11 December 2027",d:"Already sold, or will ship before that date."}]},
+ {id:"submod",title:"After 11 December 2027, what changes do you plan to make to the product?",help:"A 'substantial modification' brings an existing product under the full CRA. Select all that apply.",multi:true,
+  show:a=>a.timing==="before"&&(a.role==="mfr"||a.role==="mod"),
+  opts:[
+   {v:"patch",l:"Only security patches and bug fixes",d:"No new functions, no change to intended purpose."},
+   {v:"feat",l:"New features or functions",d:"Including remote management, cloud services, new protocols."},
+   {v:"conn",l:"New connectivity or radio interfaces",d:"Adding Wi-Fi, Bluetooth, cellular, new ports or new network exposure."},
+   {v:"purpose",l:"Change to intended purpose or target market",d:"For example consumer to industrial use."},
+   {v:"platform",l:"Major firmware, OS or hardware rework",d:"New platform, new SoC, rewritten stack."},
+   {v:"none",l:"No changes planned",d:""}]},
+ {id:"std",title:"Will you rely on a harmonised standard or EU certification scheme?",help:"For Class I products, applying a harmonised standard, common specification or EU cybersecurity certification scheme that covers every security requirement lets you self-assess. Many such standards may not be published yet.",
+  show:a=>catClass(a)==="c1"&&a.timing==="after",
+  opts:[
+   {v:"yes",l:"Yes, one covering all requirements will be available",d:""},
+   {v:"no",l:"No, or not sure",d:"Plan for a third-party conformity assessment."}]}
+];
+
+/* ---------- State ---------- */
+let A = {};            // answers
+let idx = 0;           // current visible step index
+let finished = false;
+
+function catClass(a){const c=a.cat||"none";return c==="none"?"default":c.split("|")[0];}
+function catLabel(a){const c=a.cat||"none";return c==="none"?"":c.split("|")[1];}
+function visible(){return STEPS.filter(s=>!s.show||s.show(A));}
+
+/* ---------- Early exit logic ---------- */
+function outReason(a){
+  if(a.market==="no")return {why:"The CRA covers products placed on the EU market. If you do not supply the EU, it does not apply to you directly.",note:"If your plans change, or an importer or reseller brings the product into the EU, run this check again."};
+  if(a.kind==="saas")return {why:"Pure cloud services with nothing installed on the customer's side are generally outside the CRA. A cloud backend counts only when a product depends on it.",note:"Such services are more likely to fall under NIS2 or national cyber rules, depending on your sector and size."};
+  if(a.connect==="no")return {why:"The CRA covers only products with a direct or indirect data connection to a device or network. A truly isolated product is outside it.",note:"Check that no port, update path or accessory connection exists. Foreseeable connections count."};
+  if(a.excl&&a.excl.length&&!a.excl.includes("none")){
+    const m={med:"medical device rules",veh:"vehicle type-approval rules",avi:"civil aviation rules",mar:"marine equipment rules",def:"the national security and defence exclusion",spare:"the identical spare part exclusion"};
+    return {why:"Your product falls under "+a.excl.map(x=>m[x]).join(" and ")+", so it is excluded from the CRA.",note:"The sector regime has its own cybersecurity requirements. Components outside that approval (for example, aftermarket parts) can still be in scope."};}
+  if(a.supply==="foss")return {why:"Free and open-source software supplied outside a commercial activity is not covered by the CRA.",note:"Becoming commercial (paid support, monetisation, or a commercial product that embeds it) changes this. Anyone who builds it into a commercial product takes on the manufacturer duties."};
+  if(a.supply==="internal")return {why:"Products never made available outside your organisation are not 'placed on the market', so the CRA does not apply.",note:"If you later sell or supply it to others, run this check again."};
+  return null;
+}
+
+/* ---------- Rendering ---------- */
+const app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(){
+  if(finished)return renderResult();
+  const vs=visible(); const s=vs[idx]; const total=vs.length;
+  const cur=A[s.id];
+  let h=`<div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${idx+1}"><i style="width:${(idx/total)*100}%"></i></div>
+  <div class="meta"><span>Question ${idx+1} of ${total}</span><span>${s.multi?"Select all that apply":"Choose one"}</span></div>
+  <h2>${esc(s.title)}</h2><p class="help">${esc(s.help)}</p><div class="opts" role="${s.multi?"group":"radiogroup"}" aria-label="${esc(s.title)}">`;
+  s.opts.forEach((o,i)=>{
+    if(o.g){h+=`<div class="grp">${esc(o.g)}</div>`;return;}
+    const checked=s.multi?(Array.isArray(cur)&&cur.includes(o.v)):(cur===o.v);
+    h+=`<label class="opt"><input type="${s.multi?"checkbox":"radio"}" name="q" value="${esc(o.v)}" ${checked?"checked":""}>
+      <div><b>${esc(o.l)}</b>${o.d?`<span>${esc(o.d)}</span>`:""}</div></label>`;
+  });
+  h+=`</div><div class="nav"><button id="back" ${idx===0?"disabled":""}>Back</button><button class="primary" id="next" disabled>${idx===total-1?"See result":"Next"}</button></div>`;
+  app.innerHTML=h;
+  const next=document.getElementById("next");
+  const inputs=[...app.querySelectorAll("input[name=q]")];
+  const sync=()=>{
+    if(s.multi){
+      let vals=inputs.filter(i=>i.checked).map(i=>i.value);
+      if(vals.includes("none")&&vals.length>1){ // 'none' is exclusive
+        const last=document.activeElement&&document.activeElement.value;
+        if(last==="none"){inputs.forEach(i=>{if(i.value!=="none")i.checked=false});vals=["none"];}
+        else{inputs.find(i=>i.value==="none").checked=false;vals=vals.filter(v=>v!=="none");}
+      }
+      A[s.id]=vals; next.disabled=vals.length===0;
+    }else{
+      const c=inputs.find(i=>i.checked); if(c){A[s.id]=c.value; next.disabled=false;}
+    }
+  };
+  inputs.forEach(i=>i.addEventListener("change",sync));
+  next.disabled=s.multi?!(Array.isArray(cur)&&cur.length):cur===undefined;
+  next.onclick=()=>{
+    sync();
+    if(outReason(A)){finished=true;render();window.scrollTo({top:0,behavior:"smooth"});return;}
+    const nv=visible();
+    if(idx>=nv.length-1){finished=true;}else idx++;
+    render();window.scrollTo({top:0,behavior:"smooth"});
+  };
+  document.getElementById("back").onclick=()=>{if(idx>0){idx--;render();}};
+  const f=app.querySelector("input:checked")||inputs[0]; if(f)f.focus({preventScroll:true});
+}
+
+/* ---------- Result computation ---------- */
+function fmtDate(d){return d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});}
+function daysTo(d){return Math.ceil((d-new Date())/86400000);}
+
+function compute(a){
+  const out=outReason(a);
+  if(out)return {scope:"out",...out};
+  if(a.supply==="steward")return {scope:"steward"};
+  const cls=catClass(a), role=a.role, legacy=a.timing==="before";
+  let route,routeNote;
+  if(cls==="default"){route="Self-assessment (internal control, Module A)";routeNote="You assess yourself, write the technical file and sign the EU Declaration of Conformity.";}
+  else if(cls==="c1"){
+    if(a.std==="yes"){route="Self-assessment, using a harmonised standard, common specification or EU certification scheme";routeNote="This route is open only if the standard or scheme covers every applicable security requirement. Otherwise use a third party.";}
+    else{route="Third-party assessment by a notified body (Module B+C or H)";routeNote="Without a standard or scheme covering all requirements, a notified body must assess the product.";}
+  }
+  else if(cls==="c2"){route="Third-party assessment by a notified body (Module B+C or H), or an EU cybersecurity certification scheme where available";routeNote="Self-assessment is not allowed for Class II.";}
+  else{route="European cybersecurity certification at 'substantial' assurance or higher, once the Commission requires it; otherwise the Class II route";routeNote="Critical products face the strictest regime. Check for Commission delegated acts on mandatory certification.";}
+  const classLabel={default:"Default (non-critical)",c1:"Important, Class I",c2:"Important, Class II",crit:"Critical"}[cls];
+  return {scope:"in",cls,classLabel,role,legacy,route,routeNote,item:catLabel(a)};
+}
+
+function mfrOblig(r,full){
+  const l=[
+   "Build in security from design: meet the Annex I Part I requirements (secure by default, update mechanism, access control, data protection, minimal attack surface). Art. 13",
+   "Run a vulnerability-handling process: fix without delay, publish a disclosure policy and contact point, share fixes and advisories. Annex I Part II",
+   "Keep a machine-readable SBOM covering at least top-level dependencies. Annex I Part II(1)",
+   "Provide security updates for the support period: at least 5 years, or the expected product lifetime if shorter. Art. 13(8)",
+   "Report actively exploited vulnerabilities and severe incidents through the ENISA single reporting platform: early warning within 24 hours, notification within 72 hours, final report within 14 days of a fix (vulnerabilities) or one month after the notification (incidents). Art. 14",
+   "Prepare technical documentation (Annex VII) before placing the product on the market and keep it updated. Art. 31. Keep it, with the EU Declaration of Conformity, for 10 years or the support period, whichever is longer. Art. 13",
+   "Give users clear instructions and information (Annex II), including where to report vulnerabilities and the support end date.",
+   "Sign the EU Declaration of Conformity and affix the CE marking. Arts. 28-29"
+  ];
+  if(r.legacy&&!full)return ["Because the product is placed on the market before 11 December 2027, the full design requirements do not apply unless you substantially modify it later. Art. 69",
+    "Reporting duties (Art. 14) still apply to your product from 11 September 2026: actively exploited vulnerabilities and severe incidents must be reported to the CSIRT and ENISA, with an early warning within 24 hours.",
+    "Plan a vulnerability-handling and SBOM process anyway. Any new model or substantial modification after the cutoff must meet every requirement."];
+  return l;
+}
+function otherOblig(r){
+  if(r.role==="imp")return ["Check that the manufacturer completed the conformity assessment, drew up the technical documentation, and affixed the CE marking. Art. 19","Put your name and address on the product, packaging or accompanying document. Art. 19","Keep a copy of the EU Declaration of Conformity for 10 years and cooperate with market surveillance authorities. Art. 19","Do not place a product on the market if you believe it does not conform; tell the manufacturer and authorities if it poses a significant cyber risk. Art. 19","Report actively exploited vulnerabilities and severe incidents you learn about. Art. 14"];
+  if(r.role==="dist")return ["Verify the CE marking, the instructions and the manufacturer's and importer's details before reselling. Art. 20","Hold back a product you believe is non-conforming and inform the manufacturer and authorities if there is a significant cyber risk. Art. 20","Cooperate with market surveillance authorities on request. Art. 20"];
+  return null;
+}
+
+function renderResult(){
+  const r=compute(A);
+  let h="";
+  if(r.scope==="out"){
+    h=`<div class="verdict v-out"><h2>Likely outside the CRA</h2><p>${esc(r.why)}</p></div>
+    <h3>What to keep in mind</h3><p>${esc(r.note)}</p>`;
+  }else if(r.scope==="steward"){
+    h=`<div class="verdict v-steward"><h2>Light-touch regime for open-source stewards</h2><p>You are likely an 'open-source software steward' under Article 24 rather than a manufacturer.</p></div>
+    <h3>What applies to you</h3><ul class="clean">
+    <li>Put in place and document a cybersecurity policy that fosters secure development and effective vulnerability handling.</li>
+    <li>Cooperate with market surveillance authorities on request.</li>
+    <li>Report actively exploited vulnerabilities and severe incidents affecting the project's own secure development infrastructure, where you are involved.</li>
+    <li>Fines for stewards are not applied in the same way as for manufacturers.</li></ul>
+    <p class="help">Companies that integrate your software into a commercial product become manufacturers of that product and carry the full duties.</p>`;
+  }else{
+    const roleName={mfr:"Manufacturer",imp:"Importer",dist:"Distributor",mod:"Manufacturer (by rebranding or substantial modification)"}[r.role];
+    const mfrLike=(r.role==="mfr"||r.role==="mod");
+    const subLikely=r.legacy&&Array.isArray(A.submod)&&A.submod.some(x=>["feat","conn","purpose","platform"].includes(x));
+    h=`<div class="verdict v-in"><h2>Yes, the CRA likely applies</h2><p>Your product looks like a 'product with digital elements' placed on the EU market in a commercial context.</p></div>
+    <dl class="kv"><dt>Your role</dt><dd>${esc(roleName)}</dd>
+    <dt>Risk class</dt><dd>${esc(r.classLabel)}${r.item?` <span style="font-weight:400;color:var(--muted)">(${esc(r.item)})</span>`:""}</dd>
+    <dt>Conformity route</dt><dd>${r.legacy&&!subLikely?"Applies to new or substantially modified products from 11 December 2027":esc(r.route)}</dd></dl>`;
+    if(!r.legacy||subLikely)h+=`<p class="help" style="margin-top:8px">${esc(r.routeNote)}</p>`;
+    if(A.industrial==="yes"&&r.cls==="default")h+=`<div class="callout"><b>Verify your classification.</b> Your product is for industrial environments. Class II is defined by product type, not by setting, but industrial network and security products often match one: firewalls, intrusion detection or prevention systems, hypervisors, tamper-resistant microprocessors or microcontrollers. Class I also covers routers, switches, network management systems, SIEM and operating systems. Compare your core function with Annex III before you self-assess. Misclassifying downward is a compliance risk.</div>`;
+    if(r.legacy&&Array.isArray(A.submod)){
+      const sub=A.submod.filter(x=>["feat","conn","purpose","platform"].includes(x));
+      if(sub.length)h+=`<div class="callout"><b>Likely a substantial modification.</b> The changes you plan (${esc(sub.map(x=>({feat:"new features",conn:"new connectivity",purpose:"change of purpose",platform:"major rework"}[x])).join(", "))}) can bring the modified product under the full CRA from 11 December 2027, so treat that version as a new product and prepare the full obligations below. The Commission's guidance on what counts as substantial is still developing.</div>`;
+      else if(A.submod.includes("patch"))h+=`<p class="help">Security patches and bug fixes that do not add functions or change the intended purpose are generally not a substantial modification. Keep a record of what each update changes so you can show this.</p>`;
+    }
+    if(A.radio==="yes")h+=`<div class="callout"><b>Radio Equipment Directive (RED) also applies.</b> Products with a radio interface must already meet the RED delegated act cybersecurity requirements (network protection, privacy, fraud prevention), commonly assessed with EN 18031-1, -2 and -3. Check your CE route covers both RED and the CRA.</div>`;
+    if(r.role==="mod")h+=`<p class="help">Reselling another maker's product under your own name, or changing it substantially, makes you the manufacturer for the CRA. Arts. 21-22</p>`;
+    const li=arr=>`<ul class="clean">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+    if(r.legacy&&mfrLike){
+      h+=`<h3>Your obligations now (product already on the market)</h3>${li(mfrOblig(r,false))}
+      <h3>Full obligations (new or substantially modified products from 11 December 2027)</h3>${li(mfrOblig(r,true))}`;
+    }else{
+      h+=`<h3>Your obligations</h3>${li(mfrLike?mfrOblig(r,true):otherOblig(r))}`;
+    }
+    if(r.cls==="c2"&&!r.legacy)h+=`<h3>Heads-up</h3><p>Plan for notified-body lead time. Capacity for Class II is limited, and the application process needs complete technical documentation.</p>`;
+    h+=`<h3>Penalties</h3><p>Breaching the essential requirements can cost up to €15 million or 2.5% of worldwide annual turnover, whichever is higher. Other obligations: up to €10 million or 2%. Incorrect information to authorities: up to €5 million or 1%. Art. 64</p>`;
+  }
+
+  // timeline (always)
+  const tl=[
+   {d:D_NB,t:"Notified-body rules start",s:"Conformity assessment bodies can be designated and notified."},
+   {d:D_REPORT,t:"Reporting duties apply",s:"Actively exploited vulnerabilities and severe incidents: 24 h early warning, 72 h notification. Applies to products already on the market too."},
+   {d:D_FULL,t:"Main obligations apply",s:"Design requirements, SBOM, technical file, CE marking, conformity assessment."}];
+  h+=`<h3>Key dates</h3><div class="timeline">`+tl.map(x=>{
+    const n=daysTo(x.d);
+    const p=n<=0?`<span class="pill ${x.d===D_REPORT?"p-now":"p-done"}">${x.d===D_REPORT?"In force now":"In force"}</span>`:`<span class="pill p-soon">in ${n} days</span>`;
+    return `<div class="tl"><div class="d">${esc(fmtDate(x.d))}</div><div class="t"><b>${esc(x.t)}</b><small>${esc(x.s)}</small></div>${p}</div>`;
+  }).join("")+`</div>`;
+
+  if(r.scope==="in"&&(r.role==="mfr"||r.role==="mod")){
+    const st=[];
+    if(A.radio==="yes")st.push(["EN 18031-1, -2, -3","Radio equipment: network protection, privacy, fraud prevention (RED)."]);
+    if(A.industrial==="yes")st.push(["IEC 62443-4-1 and 4-2","Secure product development lifecycle and component technical requirements for industrial products."]);
+    else st.push(["ETSI EN 303 645 / TS 103 701","Baseline security for consumer IoT and how to assess it."]);
+    if(A.industrial!=="yes")st.push(["IEC 62443-4-1","Secure development lifecycle processes, useful evidence for security-by-design."]);
+    st.push(["ISO/IEC 29147 and 30111","Vulnerability disclosure and handling processes."]);
+    st.push(["CycloneDX or SPDX","Machine-readable SBOM formats."]);
+    const seen={};
+    h+=`<h3>Standards that can support your evidence</h3><ul class="clean">`+st.filter(x=>!seen[x[0]]&&(seen[x[0]]=1)).map(x=>`<li><b>${esc(x[0])}</b>: ${esc(x[1])}</li>`).join("")+`</ul>
+    <p class="help">European harmonised standards for the CRA are still being drafted, so using these does not yet give a presumption of conformity. They are good practice and useful technical-file evidence.</p>`;
+  }
+  if(r.scope==="out"&&A.excl&&A.excl.includes("veh"))h+=`<h3>Related standards</h3><p>Vehicle cybersecurity is handled under UN R155 and R156 with ISO/SAE 21434 as the common engineering standard.</p>`;
+  if(r.scope==="in"){
+    h+=`<h3>Suggested next steps</h3><ol class="clean" style="padding-left:22px;margin:0">
+      <li style="margin:5px 0">Inventory your products and their software components; start an SBOM per product.</li>
+      <li style="margin:5px 0">Do a gap assessment against Annex I (security requirements) and Annex I Part II (vulnerability handling).</li>
+      <li style="margin:5px 0">Set up a single contact point and a 24-hour reporting process for exploited vulnerabilities.</li>
+      <li style="margin:5px 0">Confirm your risk class and conformity route with counsel or a qualified assessor before you commit.</li></ol>`;
+  }
+
+  const mail="mailto:"+CONTACT.email+"?subject="+encodeURIComponent(CONTACT.subject)+"&body="+encodeURIComponent("Hello,\n\nI ran the CRA scope check and would like a gap assessment.\n\n"+plainSummary(r)+"\n");
+  h+=`<div class="callout" style="background:var(--infobg);border-left-color:var(--brand2)"><b>Need help with your assessment?</b> Our cybersecurity team can run a CRA gap assessment and prepare your technical file. <a href="${esc(mail)}" style="color:var(--brand2);font-weight:600">Book a gap assessment</a></div>`;
+  h+=`<h3>Your answers</h3><div class="answers">${answersSummary()}</div>
+  <div class="actions"><button class="primary noprint" id="print">Print or save as PDF</button><button id="copy">Copy summary</button><button id="dl">Download record</button><button id="reset">Start again</button></div>
+  <p class="disclaimer">This is an indicative reading of Regulation (EU) 2024/2847 based on your answers. Classification and exclusions depend on a product's core functionality and exact facts, and the Commission's implementing and delegated acts, harmonised standards and guidance continue to develop. It is not legal advice; confirm with qualified counsel or a conformity assessment body.</p>`;
+  app.innerHTML=h;
+  document.getElementById("print").onclick=()=>window.print();
+  document.getElementById("reset").onclick=()=>{A={};idx=0;finished=false;render();window.scrollTo({top:0});};
+  document.getElementById("dl").onclick=()=>{
+    const rows=STEPS.filter(s=>!s.show||s.show(A)).filter(s=>A[s.id]!==undefined).map(s=>{
+      const vals=Array.isArray(A[s.id])?A[s.id]:[A[s.id]];
+      return "- "+s.title+" "+vals.map(x=>{const o=s.opts.find(o=>o.v===x);return o?o.l:x}).join("; ");});
+    const txt="# CRA Scope Assessment Record\nPresented by sudoninja\nDate: "+new Date().toISOString().slice(0,10)+"\n\n## Answers\n"+rows.join("\n")+"\n\n## Result\n"+plainSummary(r)+"\n";
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/markdown"}));
+    a.download="cra-assessment-record.md";document.body.appendChild(a);a.click();a.remove();
+  };
+  document.getElementById("copy").onclick=async e=>{
+    const t=plainSummary(r);
+    try{await navigator.clipboard.writeText(t);e.target.textContent="Copied";}catch(_){e.target.textContent="Copy failed";}
+    setTimeout(()=>e.target.textContent="Copy summary",1800);
+  };
+}
+
+function answersSummary(){
+  const lines=[];
+  STEPS.forEach(s=>{
+    if(s.show&&!s.show(A))return; const v=A[s.id]; if(v===undefined)return;
+    const vals=Array.isArray(v)?v:[v];
+    const labels=vals.map(x=>{const o=s.opts.find(o=>o.v===x);return o?o.l:x;});
+    lines.push(`<div><b>${esc(s.title)}</b> ${esc(labels.join("; "))}</div>`);
+  });
+  return lines.join("");
+}
+function plainSummary(r){
+  let t="sudoninja | CRA scope check (Regulation (EU) 2024/2847), "+new Date().toLocaleDateString("en-GB")+"\n\n";
+  if(r.scope==="out")t+="Result: likely outside the CRA\n"+r.why+"\n"+r.note+"\n";
+  else if(r.scope==="steward")t+="Result: open-source steward regime (Art. 24)\n";
+  else{
+    t+="Result: CRA likely applies\nRole: "+({mfr:"Manufacturer",imp:"Importer",dist:"Distributor",mod:"Manufacturer (rebrand/modification)"}[r.role])+"\nRisk class: "+r.classLabel+(r.item?" ("+r.item+")":"")+"\nConformity route: "+(r.legacy?"new/substantially modified products from 11 Dec 2027":r.route)+"\n";
+  }
+  t+="\nKey dates: reporting duties "+fmtDate(D_REPORT)+"; main obligations "+fmtDate(D_FULL)+".\nIndicative only; not legal advice.";
+  return t;
+}
+
+render();
+</script>
+</body>
+</html>
